@@ -11,7 +11,7 @@ declare module '@sapper/app' {
 	}
 	// end
 
-	function goto(href: string, opts = { replaceState: false }): Promise<unknown>
+	function goto(href: string, opts: { replaceState: Boolean }): Promise<unknown>
 	function prefetch(
 		href: string
 	): Promise<{ redirect?: Redirect; data?: unknown }>
