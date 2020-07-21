@@ -1,16 +1,28 @@
 # sapper-template
 
-## Usage
+### Installation 
 
 ```bash
-cd sapper-app
-npm install # or yarn!
-npm run dev
+git clone https://github.com/MichealPearce/sapped-svelte-ts-boilerplate.git ./my-app && cd ./my-app
+yarn install
 ```
 
-Open up [localhost:3000](http://localhost:3000) and start clicking around.
+## Usage
+You can find a list of commands to use during development inside of `package.json` listed under `scripts`
 
-Consult [sapper.svelte.dev](https://sapper.svelte.dev) for help getting started.
+###### Basic Command Usage
+`yarn [script id]
+
+###### Command List
+```
+dev - starts dev server and wathcing for changes in the script
+build - builds a production copy of your app that's ready to be deployed
+export - idk, it does something though
+start - starts production build
+cy:run - idk what cypress is 
+cy:open - I still don't know what cypress is
+test - runs tests but has something to do with cypress so idk
+```
 
 ## Structure
 
