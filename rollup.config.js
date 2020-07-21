@@ -1,17 +1,47 @@
 import resolve from 'rollup-plugin-node-resolve'
-import alias from '@rollup/plugin-alias'
+import aliasFactory from '@rollup/plugin-alias'
 import replace from 'rollup-plugin-replace'
 import commonjs from 'rollup-plugin-commonjs'
 import svelte from 'rollup-plugin-svelte'
 import babel from 'rollup-plugin-babel'
 import { terser } from 'rollup-plugin-terser'
-import typescript from '@wessberg/rollup-plugin-ts'
+import typescript from 'rollup-plugin-typescript2'
+
+import {
+	createEnv,
+	preprocess as makepreprocess,
+	readConfigFile,
+} from '@pyoner/svelte-ts-preprocess'
+
 import config from 'sapper/config/rollup.js'
 import pkg from './package.json'
 
 const path = require('path').resolve(__dirname, 'src')
 
-const svelteOptions = require('./svelte.config')
+const env = createEnv()
+const compilerOptions = readConfigFile(env)
+const preprocess = makepreprocess({
+	scss: { includePaths: ['src'] },
+	postcss: {
+		plugins: [require('autoprefixer')],
+	},
+	typescript: {
+		compilerOptions: {
+			...compilerOptions,
+			allowNonTsExtensions: true,
+		},
+	},
+})
+
+const alias = aliasFactory({
+	entries: [
+		{ find: '@app', replacement: `${path}/` },
+		{ find: '@components', replacement: `${path}/components` },
+		{ find: '@includes', replacement: `${path}/includes` },
+		{ find: '@styles', replacement: `${path}/styles` },
+		{ find: '@routes', replacement: `${path}/routes` },
+	],
+})
 
 const production = !process.env.ROLLUP_WATCH
 
@@ -26,29 +56,27 @@ const onwarn = (warning, onwarn) =>
 
 export default {
 	client: {
-		input: config.client.input(),
+		/**
+		 * @todo
+		 * * make input path better
+		 */
+		input: path + '/client.ts',
 		output: config.client.output(),
+		preserveEntrySignatures: false,
 		plugins: [
 			replace({
 				'process.browser': true,
-				'process.env.NODE_ENV': JSON.stringify(mode)
+				'process.env.NODE_ENV': JSON.stringify(mode),
 			}),
-			alias({
-				entries: [
-					{ find: '@app', replacement: `${path}/` },
-					{ find: '@components', replacement: `${path}/components` },
-					{ find: '@includes', replacement: `${path}/includes` },
-					{ find: '@styles', replacement: `${path}/styles` }
-				]
-			}),
+			alias,
 			svelte({
-				...svelteOptions,
 				dev,
 				hydratable: true,
-				emitCss: true
+				emitCss: true,
+				preprocess,
 			}),
 			resolve({
-				browser: true
+				browser: true,
 			}),
 			commonjs(),
 			typescript(),
@@ -62,60 +90,59 @@ export default {
 						[
 							'@babel/preset-env',
 							{
-								targets: '> 0.25%, not dead'
-							}
-						]
+								targets: '> 0.25%, not dead',
+							},
+						],
 					],
 					plugins: [
 						'@babel/plugin-syntax-dynamic-import',
 						[
 							'@babel/plugin-transform-runtime',
 							{
-								useESModules: true
-							}
-						]
-					]
+								useESModules: true,
+							},
+						],
+					],
 				}),
 
 			!dev &&
 				terser({
-					module: true
-				})
+					module: true,
+				}),
 		],
 
-		onwarn
+		onwarn,
 	},
 
 	server: {
-		input: config.server.input(),
+		/**
+		 * @todo
+		 * * make input path better
+		 */
+		input: path + '/server.ts',
 		output: config.server.output(),
+		preserveEntrySignatures: false,
 		plugins: [
 			replace({
 				'process.browser': false,
-				'process.env.NODE_ENV': JSON.stringify(mode)
+				'process.env.NODE_ENV': JSON.stringify(mode),
 			}),
-			alias({
-				entries: [
-					{ find: '@app', replacement: `${path}/` },
-					{ find: '@components', replacement: `${path}/components` },
-					{ find: '@includes', replacement: `${path}/includes` },
-					{ find: '@styles', replacement: `${path}/styles` }
-				]
-			}),
+			alias,
 			svelte({
-				...svelteOptions,
 				generate: 'ssr',
-				dev
+				dev,
+				preprocess,
 			}),
 			resolve(),
 			commonjs(),
-			typescript()
+			typescript(),
 		],
 		external: Object.keys(pkg.dependencies).concat(
-			require('module').builtinModules || Object.keys(process.binding('natives'))
+			require('module').builtinModules ||
+				Object.keys(process.binding('natives'))
 		),
 
-		onwarn
+		onwarn,
 	},
 
 	serviceworker: {
@@ -125,12 +152,12 @@ export default {
 			resolve(),
 			replace({
 				'process.browser': true,
-				'process.env.NODE_ENV': JSON.stringify(mode)
+				'process.env.NODE_ENV': JSON.stringify(mode),
 			}),
 			commonjs(),
-			!dev && terser()
+			!dev && terser(),
 		],
 
-		onwarn
-	}
+		onwarn,
+	},
 }

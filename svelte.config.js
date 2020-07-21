@@ -3,7 +3,7 @@ const sveltePreprocess = require('svelte-preprocess')
 const {
 	preprocess: makeTsPreprocess,
 	createEnv,
-	readConfigFile
+	readConfigFile,
 } = require('@pyoner/svelte-ts-preprocess')
 
 const env = createEnv('./')
@@ -12,8 +12,8 @@ const preprocessOptions = {
 	env,
 	compilerOptions: {
 		...compilerOptions,
-		allowNonTsExtensions: true
-	}
+		allowNonTsExtensions: true,
+	},
 }
 const preprocess = makeTsPreprocess(preprocessOptions)
 
@@ -24,8 +24,8 @@ module.exports = {
 		...sveltePreprocess({
 			scss: { includePaths: ['src'] },
 			postcss: {
-				plugins: [require('autoprefixer')]
-			}
-		})
-	}
+				plugins: [require('autoprefixer')],
+			},
+		}),
+	},
 }
