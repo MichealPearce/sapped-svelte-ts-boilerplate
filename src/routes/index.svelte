@@ -37,7 +37,12 @@
 </div>
 
 <style lang="scss">
-	@import 'styles/Index.scss';
+	@import 'styles/_sassy';
+
+	.page {
+		@include flex(column);
+	}
+
 	h1,
 	figure,
 	p {

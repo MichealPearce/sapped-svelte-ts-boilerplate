@@ -6,10 +6,11 @@ import svelte from 'rollup-plugin-svelte'
 import babel from 'rollup-plugin-babel'
 import { terser } from 'rollup-plugin-terser'
 import typescript from 'rollup-plugin-typescript2'
+import sveltePreprocess from 'svelte-preprocess'
 
 import {
 	createEnv,
-	preprocess as makepreprocess,
+	preprocess as tsPreprocess,
 	readConfigFile,
 } from '@pyoner/svelte-ts-preprocess'
 
@@ -20,11 +21,7 @@ const path = require('path').resolve(__dirname, 'src')
 
 const env = createEnv()
 const compilerOptions = readConfigFile(env)
-const preprocess = makepreprocess({
-	scss: { includePaths: ['src'] },
-	postcss: {
-		plugins: [require('autoprefixer')],
-	},
+const tsPreprocessed = tsPreprocess({
 	typescript: {
 		compilerOptions: {
 			...compilerOptions,
@@ -32,6 +29,13 @@ const preprocess = makepreprocess({
 		},
 	},
 })
+const sveltePreprocessed = sveltePreprocess({
+	scss: { includePaths: ['src'] },
+	postcss: {
+		plugins: [require('autoprefixer')],
+	},
+})
+const preprocess = { ...tsPreprocessed, ...sveltePreprocessed }
 
 const alias = aliasFactory({
 	entries: [
