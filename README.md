@@ -12,7 +12,7 @@ yarn install
 You can find a list of commands to use during development inside of `package.json` listed under `scripts`
 
 ###### Basic Command Usage
-`yarn [script id]
+`yarn [script id]`
 
 ###### Command List
 ```
