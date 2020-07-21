@@ -3,7 +3,8 @@
 ### Installation 
 
 ```bash
-git clone https://github.com/MichealPearce/sapped-svelte-ts-boilerplate.git ./my-app && cd ./my-app
+git clone https://github.com/MichealPearce/sapped-svelte-ts-boilerplate.git [name of app folder]
+cd [name of app folder]
 yarn install
 ```
 
