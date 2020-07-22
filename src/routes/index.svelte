@@ -1,3 +1,9 @@
+<script context="module" lang="ts" >
+	export async function preload(page, session) {
+		console.log('preload!', page, session)
+	}
+</script>
+
 <script lang="ts">
 	import { onMount } from 'svelte'
 	import { writable } from 'svelte/store'
@@ -15,7 +21,7 @@
 	<title>Sapper project template</title>
 </svelte:head>
 
-<div class="page">
+<div class="page test">
 	<h1>Great success!</h1>
 
 	<figure>
@@ -41,6 +47,9 @@
 
 	.page {
 		@include flex(column);
+		&.test {
+			background-color: blue;
+		}
 	}
 
 	h1,

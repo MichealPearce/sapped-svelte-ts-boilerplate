@@ -34,11 +34,7 @@ const onwarn = (warning, onwarn) =>
 
 export default {
 	client: {
-		/**
-		 * @todo
-		 * * make input path better
-		 */
-		input: path + '/client.ts',
+		input: config.client.input().replace(/\.js$/, '.ts'),
 		output: config.client.output(),
 		preserveEntrySignatures: false,
 		plugins: [
@@ -89,10 +85,9 @@ export default {
 
 	server: {
 		/**
-		 * @todo
-		 * * make input path better
+		 *? config.server.input returns an object instead of a string like the client does. Not sure if this is intended so I have it check the type before calling replace()
 		 */
-		input: path + '/server.ts',
+		input: ((typeof config.server.input() === 'string') ? config.server.input() : config.server.input().server).replace(/\.js$/, '.ts'),
 		output: config.server.output(),
 		preserveEntrySignatures: false,
 		plugins: [
@@ -117,11 +112,11 @@ export default {
 		onwarn,
 	},
 	/**
-	 * uncomment #swts to enable typescript for the service worker.
-	 * TS seems to work fine with the service worker but when I switch it to TS there's like 9 type errors that I'm just not trying to deal with. <3
+	 ** uncomment #swts to enable typescript for the service worker.
+	 ** TS seems to work fine with the service worker but when I switch it to TS there's like 9 type errors that I'm just not trying to deal with. <3
 	 */
 	serviceworker: {
-		//#swts input: path + '/service-worker.ts'
+		//#swts input: config.serviceworker.input().replace(/\.js$/, '.ts')
 		input: config.serviceworker.input(),
 		output: config.serviceworker.output(),
 		plugins: [

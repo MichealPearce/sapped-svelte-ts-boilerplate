@@ -1,3 +1,6 @@
+/**
+ * TODO fix this so it compiles correctly with typescript
+ */
 import { timestamp, files, shell, routes } from '@sapper/service-worker';
 
 const ASSETS = `cache${timestamp}`;
