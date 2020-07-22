@@ -6,36 +6,12 @@ import svelte from 'rollup-plugin-svelte'
 import babel from 'rollup-plugin-babel'
 import { terser } from 'rollup-plugin-terser'
 import typescript from 'rollup-plugin-typescript2'
-import sveltePreprocess from 'svelte-preprocess'
-
-import {
-	createEnv,
-	preprocess as tsPreprocess,
-	readConfigFile,
-} from '@pyoner/svelte-ts-preprocess'
 
 import config from 'sapper/config/rollup.js'
 import pkg from './package.json'
 
+const svelteOptions = require('./svelte.config.js')
 const path = require('path').resolve(__dirname, 'src')
-
-const env = createEnv()
-const compilerOptions = readConfigFile(env)
-const tsPreprocessed = tsPreprocess({
-	typescript: {
-		compilerOptions: {
-			...compilerOptions,
-			allowNonTsExtensions: true,
-		},
-	},
-})
-const sveltePreprocessed = sveltePreprocess({
-	scss: { includePaths: ['src'] },
-	postcss: {
-		plugins: [require('autoprefixer')],
-	},
-})
-const preprocess = { ...tsPreprocessed, ...sveltePreprocessed }
 
 const alias = aliasFactory({
 	entries: [
@@ -46,8 +22,6 @@ const alias = aliasFactory({
 		{ find: '@routes', replacement: `${path}/routes` },
 	],
 })
-
-const production = !process.env.ROLLUP_WATCH
 
 const mode = process.env.NODE_ENV
 const dev = mode === 'development'
@@ -73,12 +47,7 @@ export default {
 				'process.env.NODE_ENV': JSON.stringify(mode),
 			}),
 			alias,
-			svelte({
-				dev,
-				hydratable: true,
-				emitCss: true,
-				preprocess,
-			}),
+			svelte(svelteOptions),
 			resolve({
 				browser: true,
 			}),
@@ -133,9 +102,8 @@ export default {
 			}),
 			alias,
 			svelte({
+				...svelteOptions,
 				generate: 'ssr',
-				dev,
-				preprocess,
 			}),
 			resolve(),
 			commonjs(),
@@ -148,8 +116,12 @@ export default {
 
 		onwarn,
 	},
-
+	/**
+	 * uncomment #swts to enable typescript for the service worker.
+	 * TS seems to work fine with the service worker but when I switch it to TS there's like 9 type errors that I'm just not trying to deal with. <3
+	 */
 	serviceworker: {
+		//#swts input: path + '/service-worker.ts'
 		input: config.serviceworker.input(),
 		output: config.serviceworker.output(),
 		plugins: [
@@ -159,6 +131,7 @@ export default {
 				'process.env.NODE_ENV': JSON.stringify(mode),
 			}),
 			commonjs(),
+			//#swts typescript()
 			!dev && terser(),
 		],
 
