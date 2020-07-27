@@ -10,6 +10,11 @@
 
 	import Counter from '@app/components/Counter.svelte'
 
+	/**
+ 	*! Adding types to variables breaks preloading
+ 	*  TODO: Figure out why...
+	*/
+	//const count: Writable<number> = writable(100)
 	const count = writable(100)
 
 	onMount(() => {
